@@ -1,0 +1,16 @@
+docker network create esnet
+
+
+docker run -d --name es --network esnet -p 9200:9200 \
+  -e discovery.type=single-node \
+  -e xpack.security.enabled=false \
+  -e "ES_JAVA_OPTS=-Xms1g -Xmx1g" \
+  docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+
+
+docker build -t pyapp:latest .
+
+
+docker run --rm --name py --network esnet \
+  -e ES_HOST=http://es:9200 -e ES_INDEX=demo \
+  pyapp:latest
